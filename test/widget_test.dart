@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:hello/pages/config/config.dart';
 import 'package:hello/main.dart';
 
 void main() {
