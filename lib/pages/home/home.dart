@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hello/constants/config.dart';
 import 'package:http/http.dart' as http;
+import 'package:hello/model/model.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,22 +13,30 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool isloading = false;
   String m = "";
-  void fetchMovies() async {
+  int i = 0;
+  Coin coin;
+  void fetchCoins() async {
     setState(() {
       isloading = true;
     });
-    var res = await http.get(FMDBConfig.url,
-        headers: {"X-CMC_PRO_API_KEY": "04324d90-2d9d-491c-8ae7-55fd0bf861db"});
-    setState(() {
-      m = res.body;
-      isloading = false;
-    });
+    var res = await http.get(CMCConfig.url + CMCConfig.currencyEndpoint,
+        headers: {"X-CMC_PRO_API_KEY": CMCConfig.accessToken});
     var decoded = jsonDecode(res.body);
+    coin = Coin.fromJson(decoded);
+    setState(() {
+      m = coin.data[i].name;
+      isloading = false;
+      i++;
+    });
+
+    print(coin.status.timestamp);
+    print(coin.data[1].symbol);
+    print("\n");
   }
 
   @override
   void initState() {
-    fetchMovies();
+    fetchCoins();
     super.initState();
   }
 
@@ -40,11 +49,27 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('My First App')),
+        appBar: AppBar(title: Text('Crypto Currency')),
         body: isloading
             ? Center(
                 child: CircularProgressIndicator(),
               )
-            : Center(child: Text(m)));
+            : ListView.separated(
+                itemCount: coin.data.length,
+                separatorBuilder: (context, index) => Divider(),
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: Image(
+                      image: NetworkImage(
+                          "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.data[index].id}.png"),
+                      height: 40,
+                      width: 40,
+                    ),
+                    title: Text('${coin.data[index].name}'),
+                    subtitle: Text("\$ "
+                        '${coin.data[index].quote.usd.price.toStringAsFixed(2)}'),
+                  );
+                },
+              ));
   }
 }
