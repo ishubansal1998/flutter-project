@@ -7,7 +7,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My First App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primaryColor: Colors.blue[300]),
+      theme: ThemeData(
+          primaryColor: Colors.green[600],
+          accentColor: Colors.white,
+          primaryTextTheme:
+              TextTheme(headline6: TextStyle(color: Colors.white))),
       home: HomePage(),
     );
   }
